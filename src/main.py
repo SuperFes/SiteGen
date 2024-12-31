@@ -4,4 +4,5 @@ def main():
     node = TextNode("Test node", TextType.Bold, "https://example.org/")
     print(node)
 
-main()
+if __name__ == "__main__":
+    main()
