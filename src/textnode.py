@@ -29,9 +29,15 @@ class TextNode:
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
 
     def to_html_node(self):
-        if self.text_type == TextType.Link:
-            return LeafNode(self.text_type.value, self.text, {"href": self.url})
-        if self.text_type == TextType.Image:
-            return LeafNode(self.text_type.value, None, {"src": self.url})
+        attributes = {}
+        value = None
 
-        return LeafNode(self.text_type.value, self.text)
+        if self.text_type == TextType.Link:
+            value = self.text
+            attributes = {"href": self.url}
+        elif self.text_type == TextType.Image:
+            attributes = {"src": self.url, "alt": self.text}
+        else:
+            value = self.text
+
+        return LeafNode(self.text_type.value, value, attributes)

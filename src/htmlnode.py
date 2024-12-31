@@ -26,6 +26,10 @@ class HTMLNode:
         )
 
     def __str__(self):
+        # Just text
+        if not self.tag:
+            return self.value
+
         if not self.children:
             return f"<{self.tag}{self.attributes_to_html()}>{self.value}</{self.tag}>"
 
@@ -33,3 +37,8 @@ class HTMLNode:
 
     def __repr__(self):
         return f"HTMLNode({self.tag}, {self.value}, {self.attributes}, {self.children})"
+
+    def text_to_children(self, text_nodes):
+        for text_node in text_nodes:
+            self.add_child(text_node.to_html_node())
+        pass
