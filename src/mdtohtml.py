@@ -1,7 +1,6 @@
-from src.blocktype import Block
-from src.htmlnode import HTMLNode
-from src.textnode import TextNode, TextType
-
+from blocktype import Block
+from htmlnode import HTMLNode
+from textnode import TextNode, TextType
 
 def split_nodes_by_delimiter(nodes, delimiter, text_type):
     """
@@ -160,6 +159,8 @@ def markdown_to_blocks(markdown):
     text_blocks = []
 
     for block in blocks:
+        block = block.strip()
+
         if len(block) == 0:
             continue
 
@@ -252,3 +253,38 @@ def markdown_to_html_node(markdown):
         html.add_child(node)
 
     return html
+
+def extract_title(markdown):
+    """
+    Extracts the title from a markdown text.
+
+    :param markdown: markdown text
+    :return: title
+    """
+    lines = markdown.split("\n")
+
+    for line in lines:
+        if line.startswith("# "):
+            return line[2:]
+
+    raise Exception("No title found")
+
+def generate_page(from_path, template_path, dest_path):
+    """
+    Generates a page from a markdown file.
+
+    :param from_path: path to the markdown file
+    :param template_path: path to the template file
+    :param dest_path: path to the destination file
+    """
+    with open(from_path, "r") as file:
+        markdown = file.read()
+
+    with open(template_path, "r") as file:
+        template = file.read()
+
+    title = extract_title(markdown)
+    html = markdown_to_html_node(markdown)
+
+    with open(dest_path, "w") as file:
+        file.write(template.replace("{{ Title }}", title).replace("{{ Content }}", str(html)))

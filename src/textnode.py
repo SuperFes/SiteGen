@@ -1,7 +1,6 @@
 from enum import StrEnum
 
-from src.leafnode import LeafNode
-
+from leafnode import LeafNode
 
 class TextType(StrEnum):
     Normal = "",

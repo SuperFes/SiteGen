@@ -2,7 +2,7 @@ import unittest
 
 from src.blocktype import Block
 from src.mdtohtml import split_nodes_by_delimiter, extract_md_images, extract_md_links, text_to_text_nodes, \
-    markdown_to_blocks, get_block_type, markdown_to_html_node
+    markdown_to_blocks, get_block_type, markdown_to_html_node, extract_title
 from src.textnode import TextNode, TextType
 
 
@@ -64,3 +64,10 @@ class TestMDToHTML(unittest.TestCase):
         html = markdown_to_html_node(text)
 
         self.assertEqual(str(html), "<div><h1>This is a heading1 block</h1><code>\nThis is a code block\n</code><ul><li>This is a list block</li><li>Item 2</li></ul><ol><li>This is a numbered list block</li><li>Item 2</li></ol><p>This is a text block</p><p>This is text, <strong>bold</strong>, <em>italic</em>, <code>a code block</code>, an <img src=\"https://i.imgur.com/fJRm4Vk.jpeg\" alt=\"obi wan image\">None</img>, and a <a href=\"https://boot.dev\">link</a></p></div>")
+
+    def test_extract_title(self):
+        text = "# This is a heading1 block\n\n```\nThis is a code block\n```\n\n* This is a list block\n* Item 2"
+
+        title = extract_title(text)
+
+        self.assertEqual(title, "This is a heading1 block")

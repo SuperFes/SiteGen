@@ -1,6 +1,5 @@
 from enum import StrEnum
 
-
 class Block:
     class Type(StrEnum):
         Paragraph = "p",
