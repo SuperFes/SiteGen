@@ -1,5 +1,6 @@
 import unittest
-from src.mdtohtml import split_nodes_by_delimiter, extract_md_images, extract_md_links, text_to_text_nodes
+from src.mdtohtml import split_nodes_by_delimiter, extract_md_images, extract_md_links, text_to_text_nodes, \
+    markdown_to_blocks
 from src.textnode import TextNode, TextType
 
 
@@ -32,5 +33,9 @@ class TestMDToHTML(unittest.TestCase):
     def test_text_to_nodes(self):
         text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
         nodes = text_to_text_nodes(text)
-        print(nodes)
         self.assertEqual(str(nodes), "[TextNode(This is, , None), TextNode(text, , None), TextNode(with an, , None), TextNode(italic, , None), TextNode(word and a, , None), TextNode(code block, , None), TextNode(and an , , None), TextNode(obi wan image, , None), TextNode( and a , , None), TextNode(link, a, https://boot.dev)]")
+
+    def test_md_to_blocks(self):
+        text = "This is a text block\n\nThis is another text block"
+        blocks = markdown_to_blocks(text)
+        self.assertEqual(str(blocks), "['This is a text block', 'This is another text block']")

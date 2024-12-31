@@ -141,3 +141,21 @@ def text_to_text_nodes(text):
     nodes = extract_md_links(nodes)
 
     return nodes
+
+def markdown_to_blocks(markdown):
+    """
+    Converts markdown text to a list of text nodes.
+
+    :param markdown: markdown text to convert
+    :return: list of text blocks
+    """
+    blocks = markdown.split("\n\n")
+    text_blocks = []
+
+    for block in blocks:
+        if len(block) == 0:
+            continue
+
+        text_blocks.append(block)
+
+    return text_blocks
