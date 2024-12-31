@@ -1,8 +1,11 @@
-from textnode import TextType, TextNode
+from shutil import copytree, rmtree
+
+def copy_static():
+    rmtree("./public")
+    copytree("./static", "./public")
 
 def main():
-    node = TextNode("Test node", TextType.Bold, "https://example.org/")
-    print(node)
+    copy_static()
 
 if __name__ == "__main__":
     main()
