@@ -4,7 +4,7 @@ from src.leafnode import LeafNode
 
 
 class TextType(StrEnum):
-    Normal = "p",
+    Normal = "",
     Bold   = "strong",
     Italic = "em",
     Code   = "code",
