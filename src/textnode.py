@@ -4,8 +4,8 @@ from leafnode import LeafNode
 
 class TextType(StrEnum):
     Normal = "",
-    Bold   = "strong",
-    Italic = "em",
+    Bold   = "b",
+    Italic = "i",
     Code   = "code",
     Link   = "a",
     Image  = "img"

@@ -13,32 +13,28 @@ def split_nodes_by_delimiter(nodes, delimiter, text_type):
     """
     new_nodes = []
 
-    search_len = len(delimiter)
-
     for node in nodes:
         if not delimiter in node.text:
             new_nodes.append(node)
         else:
             text = node.text
 
-            while (True):
-                delim_start = text.find(f"{delimiter}")
-                delim_end = text.find(f"{delimiter}", delim_start + search_len)
+            while delimiter in text:
+                parts = text.split(delimiter, 2)
 
-                if delim_start == -1 or delim_end == -1:
-                    break
-
-                left = node.text[0:delim_start]
-                mid = node.text[delim_start + search_len:delim_end]
-                text = node.text[delim_end + search_len:]
+                left = parts[0]
+                mid = parts[1]
+                right = parts[2]
 
                 if len(left):
-                    new_nodes.append(TextNode(left, node.text_type))
+                    new_nodes.append(TextNode(left, TextType.Normal))
 
                 new_nodes.append(TextNode(mid, text_type))
 
+                text = right
+
             if len(text):
-                new_nodes.append(TextNode(text, node.text_type))
+                new_nodes.append(TextNode(text, TextType.Normal))
 
     return new_nodes
 
@@ -145,7 +141,6 @@ def text_to_text_nodes(text):
     nodes = split_nodes_by_delimiter(nodes, "`", TextType.Code)
     nodes = extract_md_images(nodes)
     nodes = extract_md_links(nodes)
-
     return nodes
 
 def markdown_to_blocks(markdown):
@@ -175,23 +170,23 @@ def get_block_type(block):
     :param block: text block
     :return: block type
     """
-    if block.startswith("#" * 6):
+    if block.startswith("#" * 6 + " "):
         return Block.Type.Heading6
-    if block.startswith("#" * 5):
+    if block.startswith("#" * 5 + " "):
         return Block.Type.Heading5
-    if block.startswith("#" * 4):
+    if block.startswith("#" * 4 + " "):
         return Block.Type.Heading4
-    if block.startswith("#" * 3):
+    if block.startswith("#" * 3 + " "):
         return Block.Type.Heading3
-    if block.startswith("#" * 2):
+    if block.startswith("#" * 2 + " "):
         return Block.Type.Heading2
-    if block.startswith("#"):
+    if block.startswith("# "):
         return Block.Type.Heading1
-    if block.startswith("-") or block.startswith("*"):
+    if block.startswith("- ") or block.startswith("* "):
         return Block.Type.UnorderedList
-    if block.startswith("1."):
+    if block.startswith("1. "):
         return Block.Type.OrderedList
-    if block.startswith(">"):
+    if block.startswith("> "):
         return Block.Type.Blockquote
     if block.startswith("```") and block.endswith("```"):
         return Block.Type.CodeBlock
@@ -208,30 +203,52 @@ def process_block(block):
     """
     block_type = get_block_type(block)
 
-    if block_type == Block.Type.Heading1:
-        return HTMLNode(block_type, block[2:])
-    if block_type == Block.Type.Heading2:
-        return HTMLNode(block_type, block[3:])
-    if block_type == Block.Type.Heading3:
-        return HTMLNode(block_type, block[4:])
-    if block_type == Block.Type.Heading4:
-        return HTMLNode(block_type, block[5:])
-    if block_type == Block.Type.Heading5:
-        return HTMLNode(block_type, block[6:])
-    if block_type == Block.Type.Heading6:
-        return HTMLNode(block_type, block[7:])
-    if block_type == Block.Type.Blockquote:
-        return HTMLNode(block_type, block.replace("> ", ""))
-    if block_type == Block.Type.CodeBlock:
-        return HTMLNode(block_type, block[3:-3])
-    if block_type == Block.Type.UnorderedList:
-        return HTMLNode(Block.Type.UnorderedList, None, None, list(map(lambda line: HTMLNode(Block.Type.ListItem, line[2:]), block.split("\n"))))
-    if block_type == Block.Type.OrderedList:
-        return HTMLNode(Block.Type.OrderedList, None, None, list(map(lambda line: HTMLNode(Block.Type.ListItem, line[3:]), block.split("\n"))))
-
-    text_nodes = text_to_text_nodes(block)
     node = HTMLNode(block_type)
-    node.text_to_children(text_nodes)
+
+    if block_type == Block.Type.Heading1:
+        block = block[2:]
+    if block_type == Block.Type.Heading2:
+        block = block[3:]
+    if block_type == Block.Type.Heading3:
+        block = block[4:]
+    if block_type == Block.Type.Heading4:
+        block = block[5:]
+    if block_type == Block.Type.Heading5:
+        block = block[6:]
+    if block_type == Block.Type.Heading6:
+        block = block[7:]
+    if block_type == Block.Type.Blockquote:
+        block = block.replace("> ", "")
+    if block_type == Block.Type.CodeBlock:
+        block = block[3:-3]
+    if block_type == Block.Type.UnorderedList:
+        items = block.split("\n")
+        block = ""
+
+        for item in items:
+            li_node = HTMLNode(Block.Type.ListItem)
+            node.add_child(li_node)
+
+            child_nodes = text_to_text_nodes(item[2:])
+            li_node.text_to_children(child_nodes)
+    if block_type == Block.Type.OrderedList:
+        items = block.split("\n")
+        block = ""
+        num = 1
+
+        for item in items:
+            li_node = HTMLNode(Block.Type.ListItem)
+            node.add_child(li_node)
+
+            item_len = len(f"{num}. ")
+
+            child_nodes = text_to_text_nodes(item[item_len:])
+            li_node.text_to_children(child_nodes)
+
+            num += 1
+
+    if len(block):
+        node.text_to_children(text_to_text_nodes(block))
 
     return node
 

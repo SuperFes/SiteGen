@@ -30,10 +30,15 @@ class HTMLNode:
         if not self.tag:
             return self.value
 
-        if not self.children:
-            return f"<{self.tag}{self.attributes_to_html()}>{self.value}</{self.tag}>"
+        attr = ""
 
-        return f"<{self.tag}{self.attributes_to_html()}>{''.join(str(child) for child in self.children)}</{self.tag}>"
+        if self.attributes:
+            attr = self.attributes_to_html()
+
+        if not self.children:
+            return f"<{self.tag}{attr}>{self.value}</{self.tag}>"
+
+        return f"<{self.tag}{attr}>{''.join(str(child) for child in self.children)}</{self.tag}>"
 
     def __repr__(self):
         return f"HTMLNode({self.tag}, {self.value}, {self.attributes}, {self.children})"
